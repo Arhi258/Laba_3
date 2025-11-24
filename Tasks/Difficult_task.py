@@ -2,33 +2,56 @@
 # -*- coding: utf-8 -*-
 
 import math
+import sys
 
 
 if __name__ == '__main__':
-    x = int(input("Введите x: "))
-    n = 0
-    c = 0
+    x = float(input("Введите x: "))
 
-    sign = 1    # (-1) ** n
-    factorial_part = 1.0    # factorial(2 * n)
-    pi2_sq = (math.pi / 2) ** 2
-    pi_power = 1.0    # (pi / 2) ** (2 * n)
-    x_power = x    # x ** (4 * n + 1), при n = 0 -> x ** 1
+    if abs(x) > 20:
+         print(
+             "Слишком большое значение x для рекуррентного метода",
+             file=sys.stderr
+         )
+         exit(1)
 
-    while True:
-        # Вычисление члена ряда.
-        term = sign * pi_power * x_power / (factorial_part * (4 * n + 1))
-        c += term
+    if x == 0:
+        C = 0.0
+    else:
+        sign = 1.0
+        if x < 0:
+            x = -x
+            sign = -1.0
 
-        # Условие точности.
-        if abs(term) < 1e-10:
-            break
+        # Однократные вычисления
+        p2 = (math.pi / 2) ** 2
+        x4 = x ** 4
+        work = p2 * x4
 
-        # Подготовка для следующего n
-        n += 1
-        sign = -sign
-        factorial_part *= (2 * n - 1) * (2 * n)
-        pi_power *= pi2_sq
-        x_power *= x ** 4
+        # Начальный член ряда
+        a = x
+        summ = a
 
-    print(f"C({x}) ≈ {c:.10f}, число членов ряда = {n + 1}")
+        # Основной цикл рекурентного ряда
+        k = 1
+        while True:
+            # Рекуррентный коэффициент
+            r = - (
+                    work * (4 * k - 3)
+            ) / (
+                    (2 * k) * (2 * k - 1) * (4 * k + 1)
+            )
+
+            a *= r
+            summ += a
+
+            # Проверка точности
+            if abs(a) < 1e-10:
+                break
+
+            k += 1
+
+        C = sign * summ
+
+    print(f"C = {C}")
+
